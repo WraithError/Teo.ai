@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+*.npz
+*.weights
+data/raw/
+
+# Training artifacts (weights can be large — commit model_card.json instead)
+ai/training/checkpoints/*.npz
