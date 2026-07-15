@@ -239,12 +239,13 @@ def backward_pass(
 # Checkpoint I/O
 # ─────────────────────────────────────────────────────────────────────────────
 
-def save_checkpoint(
+def save_best_checkpoint(
     lstm: LSTM, dense: Dense,
     epoch: int, train_loss: float, val_loss: float, perplexity: float,
     tokenizer: CharTokenizer, cfg: argparse.Namespace,
     path: Path,
 ) -> None:
+    """Persist the best model weights to best_weights.npz and metadata to model_card.json."""
     path.mkdir(parents=True, exist_ok=True)
 
     weights_path = path / "best_weights.npz"
@@ -276,6 +277,19 @@ def save_checkpoint(
     }
     with open(card_path, "w", encoding="utf-8") as f:
         json.dump(card, f, indent=2)
+
+
+def save_checkpoint(
+    lstm: LSTM, dense: Dense,
+    epoch: int, train_loss: float, val_loss: float, perplexity: float,
+    tokenizer: CharTokenizer, cfg: argparse.Namespace,
+    path: Path,
+) -> None:
+    """Backward-compatible alias for the best-checkpoint writer."""
+    save_best_checkpoint(
+        lstm, dense, epoch, train_loss, val_loss, perplexity,
+        tokenizer, cfg, path,
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -323,7 +337,10 @@ def train(cfg: argparse.Namespace) -> None:
     loss_fn = CrossEntropyLoss(from_logits=True)
     layers  = [lstm, dense]
 
+    best_epoch = 0
+    best_train_loss = None
     best_val_loss = float("inf")
+    best_perplexity = None
     t0 = time.time()
 
     for epoch in range(1, cfg.epochs + 1):
@@ -388,8 +405,11 @@ def train(cfg: argparse.Namespace) -> None:
 
         # ── Save best ────────────────────────────────────────────────────────
         if val_loss < best_val_loss:
+            best_epoch = epoch
+            best_train_loss = train_loss
             best_val_loss = val_loss
-            save_checkpoint(
+            best_perplexity = perplexity
+            save_best_checkpoint(
                 lstm, dense, epoch, train_loss, val_loss, perplexity,
                 tokenizer, cfg, CHECKPOINT_DIR
             )
@@ -397,6 +417,12 @@ def train(cfg: argparse.Namespace) -> None:
         if cfg.dry_run and epoch >= 3:
             print("\n  [dry-run] Stopping after 3 epochs.")
             break
+
+    if best_epoch > 0 and best_train_loss is not None and best_perplexity is not None:
+        save_best_checkpoint(
+            lstm, dense, best_epoch, best_train_loss, best_val_loss, best_perplexity,
+            tokenizer, cfg, CHECKPOINT_DIR,
+        )
 
     print()
     print(f"Training complete. Best val_loss: {best_val_loss:.4f}  "
