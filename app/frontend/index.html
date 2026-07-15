@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TEO.AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="bg-[#0a0a0a] text-[#c8c8c8] h-screen flex flex-col">
+
+<header class="flex items-center gap-3 px-6 py-3.5 border-b border-[#222222] shrink-0">
+  <div class="flex items-center gap-2.5">
+    <div class="relative flex items-center">
+      <div class="barcode flex gap-0.5 items-end h-7">
+        <span style="height:28px"></span>
+        <span style="height:20px"></span>
+        <span style="height:26px"></span>
+        <span style="height:16px"></span>
+        <span style="height:28px"></span>
+        <span style="height:22px"></span>
+        <span style="height:18px"></span>
+        <span style="height:28px"></span>
+        <span style="height:14px"></span>
+        <span style="height:24px"></span>
+        <span style="height:28px"></span>
+        <span style="height:20px"></span>
+      </div>
+      <div class="slash"></div>
+    </div>
+    <span class="text-lg font-bold tracking-[0.25em] text-[#c8c8c8]">TEO</span>
+    <span class="text-[10px] font-bold text-[#f5c400] tracking-[0.15em] border border-[#f5c400] px-1.5 py-px">.AI</span>
+    <span class="text-[10px] text-[#555555] tracking-widest ml-2">v0.4</span>
+  </div>
+
+  <div class="ml-auto flex items-center gap-2">
+    <span id="status-dot" class="status-dot offline"></span>
+    <span id="status-text" class="text-[10px] tracking-[0.2em] text-[#555555]">CHECKING</span>
+    <span class="text-[10px] tracking-[0.2em] text-[#555555] ml-4 hidden sm:inline">DEPLOY. DEFEND. EVOLVE.</span>
+  </div>
+</header>
+
+<div id="chat-window" class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-4"></div>
+
+<div id="input-bar" class="flex border-t border-[#222222] shrink-0">
+  <textarea
+    id="user-input"
+    class="flex-1 bg-[#111111] text-[#c8c8c8] border-0 outline-none text-[13px] px-5 py-4 resize-none h-14 leading-snug placeholder:text-[#555555]"
+    placeholder="Talk to Teo..."
+    rows="1"
+    aria-label="Message input"
+  ></textarea>
+  <button
+    id="send-btn"
+    class="bg-[#f5c400] text-[#0a0a0a] border-0 text-[11px] font-bold tracking-[0.15em] px-7 cursor-pointer transition-colors hover:bg-[#ffd700] disabled:bg-[#a38200] disabled:cursor-not-allowed"
+    aria-label="Send message"
+  >SEND</button>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
