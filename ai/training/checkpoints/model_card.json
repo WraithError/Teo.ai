@@ -1,9 +1,9 @@
 {
   "version": "0.1",
-  "saved_epoch": 1,
-  "train_loss": 3.634,
-  "val_loss": 3.1085,
-  "perplexity": 22.3881,
+  "saved_epoch": 44,
+  "train_loss": 1.4666,
+  "val_loss": 1.7893,
+  "perplexity": 5.9852,
   "architecture": {
     "type": "CharLM_LSTM",
     "vocab_size": 98,
