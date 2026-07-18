@@ -1,0 +1,50 @@
+{
+  "version": "0.2",
+  "saved_epoch": 4,
+  "train_loss": 2.6223,
+  "val_loss": 2.5256,
+  "perplexity": 12.4984,
+  "architecture": {
+    "type": "CharLM_Embedding_LSTM",
+    "vocab_size": 98,
+    "embed_dim": 64,
+    "hidden_size": 128
+  },
+  "training": {
+    "optimizer": "Adam",
+    "lr": 0.003,
+    "batch_size": 16,
+    "max_seq_len": 256,
+    "grad_clip": 1.0,
+    "backend": "numpy"
+  },
+  "data": {
+    "tokenizer": "datasets/tokenizer/vocab.json"
+  },
+  "loss_history": [
+    {
+      "epoch": 1,
+      "train_loss": 3.5791,
+      "val_loss": 3.1015,
+      "ppl": 22.2312
+    },
+    {
+      "epoch": 2,
+      "train_loss": 3.0723,
+      "val_loss": 2.9142,
+      "ppl": 18.4339
+    },
+    {
+      "epoch": 3,
+      "train_loss": 2.8159,
+      "val_loss": 2.6555,
+      "ppl": 14.2317
+    },
+    {
+      "epoch": 4,
+      "train_loss": 2.6223,
+      "val_loss": 2.5256,
+      "ppl": 12.4984
+    }
+  ]
+}

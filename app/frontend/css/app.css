@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --black:      #0a0a0a;
+  --surface:    #111111;
+  --border:     #222222;
+  --dim-white:  #c8c8c8;
+  --muted:      #555555;
+  --yellow:     #f5c400;
+  --yellow-dim: #a38200;
+}
+
+body {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+#chat-window::-webkit-scrollbar { width: 6px; }
+#chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.barcode span {
+  background: var(--dim-white);
+  width: 2px;
+  display: block;
+}
+
+.barcode .slash {
+  position: absolute;
+  width: 2px;
+  height: 28px;
+  background: var(--yellow);
+  transform: rotate(12deg);
+}
+
+.message pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.thinking { animation: blink 1s infinite; }
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.online  { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+.status-dot.offline { background: var(--muted); }
