@@ -56,24 +56,28 @@ class TeoEngine:
             self.tokenizer = CharTokenizer.load(str(TOKENIZER_PATH))
 
         if CARD_PATH.exists() and WEIGHTS_PATH.exists():
-            sys.path.insert(0, str(ROOT / "ai" / "nanonet"))
-            from nanonet.layers.lstm import LSTM
-            from nanonet.layers.dense import Dense
-            from nanonet.utils.io import load_weights
+            try:
+                sys.path.insert(0, str(ROOT / "ai" / "nanonet"))
+                from nanonet.layers.lstm import LSTM
+                from nanonet.layers.dense import Dense
+                from nanonet.utils.io import load_weights
 
-            with open(CARD_PATH, encoding="utf-8") as f:
-                card = json.load(f)
+                with open(CARD_PATH, encoding="utf-8") as f:
+                    card = json.load(f)
 
-            arch = card["architecture"]
-            self.lstm = LSTM(
-                input_size=arch["vocab_size"],
-                hidden_size=arch["hidden_size"],
-                return_sequences=True,
-            )
-            self.dense = Dense(arch["hidden_size"], arch["vocab_size"])
-            load_weights([self.lstm, self.dense], str(WEIGHTS_PATH))
-            self.lstm.eval()
-            self.dense.eval()
+                arch = card["architecture"]
+                self.lstm = LSTM(
+                    input_size=arch["vocab_size"],
+                    hidden_size=arch["hidden_size"],
+                    return_sequences=True,
+                )
+                self.dense = Dense(arch["hidden_size"], arch["vocab_size"])
+                load_weights([self.lstm, self.dense], str(WEIGHTS_PATH))
+                self.lstm.eval()
+                self.dense.eval()
+            except Exception:
+                self.lstm = None
+                self.dense = None
 
     def is_model_loaded(self) -> bool:
         return self.lstm is not None and self.dense is not None
@@ -97,25 +101,31 @@ class TeoEngine:
 
     def _generate(self, user_message: str, max_tokens: int = 300, temperature: float = 0.8) -> str:
         import numpy as np
+        if self.tokenizer is None or self.lstm is None or self.dense is None:
+            raise RuntimeError("Model is not usable")
+
         V = self.tokenizer.vocab_size
         prefix_ids = [START] + self.tokenizer.encode_chars(user_message) + [SEP]
         generated_ids: list[int] = []
 
-        for _ in range(max_tokens):
-            current_ids = prefix_ids + generated_ids
-            x = self._one_hot_sequence(current_ids, V)
-            lstm_out = self.lstm.forward(x)
-            last_hidden = lstm_out[0, -1, :][np.newaxis, :]
-            logits = self.dense.forward(last_hidden)[0]
-            next_id = self._sample_token(logits, temperature=temperature)
+        try:
+            for _ in range(max_tokens):
+                current_ids = prefix_ids + generated_ids
+                x = self._one_hot_sequence(current_ids, V)
+                lstm_out = self.lstm.forward(x)
+                last_hidden = lstm_out[0, -1, :][np.newaxis, :]
+                logits = self.dense.forward(last_hidden)[0]
+                next_id = self._sample_token(logits, temperature=temperature)
 
-            if next_id == EOS:
-                break
-            if next_id == 0:  # PAD
-                continue
-            generated_ids.append(next_id)
+                if next_id == EOS:
+                    break
+                if next_id == 0:  # PAD
+                    continue
+                generated_ids.append(next_id)
 
-        return self.tokenizer.decode(generated_ids)
+            return self.tokenizer.decode(generated_ids)
+        except Exception as exc:
+            raise RuntimeError("Generation failed") from exc
 
     def get_response(self, user_message: str, history: Optional[list] = None) -> str:
         """
@@ -124,7 +134,14 @@ class TeoEngine:
         so the contract doesn't change later (see architecture.md Phase 2).
         """
         if self.is_model_loaded():
-            return self._generate(user_message)
+            try:
+                return self._generate(user_message)
+            except Exception:
+                return (
+                    "Accepted. Brain's not trained yet — you're talking to placeholder Teo. "
+                    "Tokenizer + language-model training loop are in ai/training/. "
+                    "Run that, drop a checkpoint in ai/training/checkpoints/, and I wake up."
+                )
 
         if CARD_PATH.exists() and not WEIGHTS_PATH.exists():
             return (
